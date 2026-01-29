@@ -13,6 +13,7 @@ import {
   startTypingIndicator,
 } from "../utils";
 import { StreamingState, createStatusCallback } from "./streaming";
+import { userManager } from "./commands";
 
 /**
  * Handle incoming text messages.
@@ -33,13 +34,16 @@ export async function handleText(ctx: Context): Promise<void> {
     return;
   }
 
-  // 2. Check for interrupt prefix
+  // 2. Track user request (without tokens for now, will be updated after response)
+  userManager.trackRequest(userId);
+
+  // 3. Check for interrupt prefix
   message = await checkInterrupt(message);
   if (!message.trim()) {
     return;
   }
 
-  // 3. Rate limit check
+  // 4. Rate limit check
   const [allowed, retryAfter] = rateLimiter.check(userId);
   if (!allowed) {
     await auditLogRateLimit(userId, username, retryAfter!);
@@ -49,10 +53,10 @@ export async function handleText(ctx: Context): Promise<void> {
     return;
   }
 
-  // 4. Store message for retry
+  // 5. Store message for retry
   session.lastMessage = message;
 
-  // 5. Set conversation title from first message (if new session)
+  // 6. Set conversation title from first message (if new session)
   if (!session.isActive) {
     // Truncate title to ~50 chars
     const title =
@@ -60,17 +64,17 @@ export async function handleText(ctx: Context): Promise<void> {
     session.conversationTitle = title;
   }
 
-  // 6. Mark processing started
+  // 7. Mark processing started
   const stopProcessing = session.startProcessing();
 
-  // 7. Start typing indicator
+  // 8. Start typing indicator
   const typing = startTypingIndicator(ctx);
 
-  // 8. Create streaming state and callback
+  // 9. Create streaming state and callback
   let state = new StreamingState();
   let statusCallback = createStatusCallback(ctx, state);
 
-  // 9. Send to Claude with retry logic for crashes
+  // 10. Send to Claude with retry logic for crashes
   const MAX_RETRIES = 1;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -84,7 +88,13 @@ export async function handleText(ctx: Context): Promise<void> {
         ctx
       );
 
-      // 10. Audit log
+      // 11. Track token usage if available
+      if (session.lastUsage) {
+        const totalTokens = (session.lastUsage.input_tokens || 0) + (session.lastUsage.output_tokens || 0);
+        userManager.trackRequest(userId, totalTokens);
+      }
+
+      // 12. Audit log
       await auditLog(userId, username, "TEXT", message, response);
       break; // Success - exit retry loop
     } catch (error) {
@@ -130,7 +140,7 @@ export async function handleText(ctx: Context): Promise<void> {
     }
   }
 
-  // 11. Cleanup
+  // 13. Cleanup
   stopProcessing();
   typing.stop();
 }
