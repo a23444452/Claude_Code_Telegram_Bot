@@ -80,3 +80,15 @@ export interface PendingMediaGroup {
 
 // Bot context with optional message
 export type BotContext = Context;
+
+// Session configuration for working directory management
+export interface SessionConfig {
+  sessionId: string;
+  workingDir: string;
+  lastWorkingDirs: string[];
+}
+
+// Enhanced saved session with optional config
+export interface EnhancedSavedSession extends SavedSession {
+  config?: SessionConfig;
+}
