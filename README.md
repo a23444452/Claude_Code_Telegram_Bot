@@ -1,34 +1,134 @@
 # Claude Telegram Bot - Enhanced Edition
 
-基於 [linuz90/claude-telegram-bot](https://github.com/linuz90/claude-telegram-bot) 的增強版本
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bun](https://img.shields.io/badge/Bun-1.0+-black.svg)](https://bun.sh/)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/a23444452/Claude_Code_Telegram_Bot/releases)
+[![Tests](https://img.shields.io/badge/tests-51%20passing-brightgreen.svg)](https://github.com/a23444452/Claude_Code_Telegram_Bot)
+
+**透過 Telegram 隨時隨地存取 [Claude Code](https://claude.com/product/claude-code)，打造你的個人 AI 助理。**
+
+發送文字、語音、照片和文件，即時查看回應和工具使用狀況。支援工作目錄管理、智慧權限控制和使用統計追蹤。
+
+基於 [linuz90/claude-telegram-bot](https://github.com/linuz90/claude-telegram-bot) 開發的增強版本。
+
+---
+
+## ✨ 主要特色
+
+### 💬 多媒體互動
+- **文字對話** - 提問、下指令、進行對話
+- **語音訊息** - 自然說話，透過 OpenAI 轉錄後由 Claude 處理
+- **照片分析** - 發送截圖、文件或任何視覺內容進行分析
+- **文件處理** - PDF、程式碼檔案、壓縮檔 (ZIP, TAR) 自動解壓並分析
+
+### 🗂️ 工作目錄管理 ⭐ 新功能
+輕鬆管理 Claude 的工作目錄，讓 Claude 能在正確的專案路徑下工作：
+
+- **`/pwd`** - 顯示當前工作目錄
+- **`/ls [path]`** - 列出目錄內容
+  - 支援相對路徑：`/ls Documents`
+  - 支援絕對路徑：`/ls ~/projects/my-app`
+  - 顯示檔案類型圖示 (📁 資料夾、📄 檔案)
+- **`/cd <path>`** - 切換工作目錄
+  - 支援相對路徑：`/cd projects`
+  - 支援回到上層：`/cd ..`
+  - 內建路徑安全驗證
+
+**使用範例：**
+```
+你: /cd ~/projects/my-app
+Bot: ✅ 已切換到 /Users/vincewang/projects/my-app
+
+你: /ls src
+Bot: 📁 components
+     📁 utils
+     📄 index.ts
+     📄 App.tsx
+
+你: 幫我重構 src/utils/helpers.ts
+Bot: [Claude 開始分析並重構...]
+```
+
+### 🔐 混合模式權限控制 ⭐ 新功能
+智慧型權限系統，在安全性和使用體驗間取得最佳平衡：
+
+**自動執行（無需確認）**
+- 檔案讀取：`Read`, `Glob`, `Grep`
+- 網路查詢：`WebSearch`, `WebFetch`
+- 安全指令：`ls`, `pwd`, `cat`, `grep`, `find`, `echo`, `which`
+
+**需要確認**
+- 檔案修改：`Edit`, `Write`
+- 危險指令：`rm`, `mv`, `cp`, `git commit`, `git push`, `npm install`, `bun install`
+
+**可自訂配置** - 透過 `config/permissions.json` 調整規則
+
+詳細說明請參考 [權限系統文件](docs/PERMISSIONS.md)
+
+### 📊 使用統計追蹤 ⭐ 新功能
+即時追蹤你的使用狀況：
+
+```
+你: /stats
+Bot: 📊 使用統計
+
+     👤 User ID: 8570068728
+     📝 總請求數: 42
+     🔢 總 Token 數: 125,430
+     ⏰ 最後活動: 2026/01/29 下午2:45
+     📅 建立時間: 2026/01/29 上午10:30
+```
+
+### 🔄 Session 管理
+- **Session 持久化** - 對話跨訊息持續進行
+- **訊息佇列** - 可同時發送多則訊息，自動排隊處理
+- **中斷控制** - 訊息開頭加 `!` 或使用 `/stop` 立即中斷並發送
+- **Session 恢復** - 使用 `/resume` 從最近的對話中選擇並繼續
+
+### 🧠 深度思考模式
+在訊息中包含特定關鍵字，觸發 Claude 的推理過程，你會看到完整的思考步驟：
+
+- 預設關鍵字：`think`, `pensa`, `ragiona`
+- 深度思考：`ultrathink`, `think hard`, `pensa bene`
+- 可透過環境變數自訂關鍵字
+
+**使用範例：**
+```
+你: think 比較 React 和 Vue 的優缺點
+Bot: [顯示思考過程...]
+     [提供詳細比較分析...]
+```
+
+### 🔘 互動式按鈕
+Claude 可透過內建的 `ask_user` MCP 工具呈現選項，以可點擊的按鈕方式讓你選擇。
+
+---
 
 ## 🚀 快速開始
 
-**完全新手?** 請直接閱讀 → [📖 完整操作指南 (GETTING_STARTED.md)](docs/GETTING_STARTED.md)
-
-**超快速啟動** (一鍵腳本):
+### 超快速啟動（一鍵腳本）
 
 ```bash
 # 1. Clone 專案
 git clone https://github.com/a23444452/Claude_Code_Telegram_Bot.git
 cd Claude_Code_Telegram_Bot
 
-# 2. 執行一鍵啟動腳本
+# 2. 設定環境變數（首次需要）
+cp .env.example .env
+nano .env  # 編輯並填入你的 Bot Token 和 User ID
+
+# 3. 執行一鍵啟動腳本
 ./start.sh
 ```
 
-腳本會自動:
+腳本會自動：
 - ✅ 檢查 Bun 安裝
-- ✅ 檢查配置檔案
-- ✅ 安裝依賴(如需要)
+- ✅ 驗證配置檔案
+- ✅ 安裝依賴（如需要）
 - ✅ 執行測試驗證
-- ✅ 提供啟動選項(前台/背景)
+- ✅ 提供啟動選項（前台/背景）
 
-**手動啟動** (傳統方式):
+### 手動啟動
 
 ```bash
 # 1. Clone 專案
@@ -40,354 +140,378 @@ bun install
 
 # 3. 設定環境變數
 cp .env.example .env
-nano .env  # 編輯並填入你的 Bot Token 和 User ID
+nano .env  # 編輯設定
 
 # 4. 啟動 Bot
 bun run src/index.ts
 ```
 
-**管理腳本**:
-- `./start.sh` - 一鍵啟動 Bot (含環境檢查)
-- `./stop.sh` - 停止 Bot
-- `./status.sh` - 完整狀態檢查
+### 管理腳本
 
-**前置需求**: Bun, Telegram Bot Token, Claude Code 或 Anthropic API Key
-
-詳細步驟請參考:
-- 📖 [完整操作指南 (GETTING_STARTED.md)](docs/GETTING_STARTED.md) - 詳細的一步步教學
-- 📊 [設定流程圖 (SETUP_FLOWCHART.md)](docs/SETUP_FLOWCHART.md) - 視覺化流程指南
+- **`./start.sh`** - 一鍵啟動（含環境檢查）
+- **`./stop.sh`** - 停止 Bot
+- **`./status.sh`** - 完整健康檢查
 
 ---
 
-## 新增功能
+## 📋 前置需求
 
-### 🗂️ 工作目錄管理
-
-在 Telegram 中輕鬆管理 Claude 的工作目錄，讓 Claude 能在正確的專案路徑下工作：
-
-- **`/pwd`** - 顯示當前工作目錄
-- **`/ls [path]`** - 列出目錄內容，支援相對路徑和絕對路徑
-- **`/cd <path>`** - 切換工作目錄（包含安全性檢查）
-
-**使用範例：**
-```
-/cd ~/projects/my-app
-/pwd
-→ 📁 /Users/vincewang/projects/my-app
-
-/ls src
-→ 📁 components
-  📁 utils
-  📄 index.ts
-  📄 App.tsx
-```
-
-**安全機制：**
-- 所有路徑操作受 `ALLOWED_PATHS` 限制
-- 嘗試存取未授權目錄會被拒絕
-- 自動驗證目錄存在性
-
-### 🔐 混合模式權限控制
-
-智慧型權限系統，自動執行安全操作，危險操作需要確認，提供最佳的使用體驗和安全性平衡：
-
-**自動執行（無需確認）：**
-- 檔案讀取工具：`Read`, `Glob`, `Grep`
-- 網路查詢工具：`WebSearch`, `WebFetch`
-- 安全 Bash 指令：`ls`, `pwd`, `cat`, `grep`, `find`, `echo`, `which`
-
-**需要確認：**
-- 檔案修改工具：`Edit`, `Write`
-- 危險 Bash 指令：`rm`, `mv`, `cp`, `git commit`, `git push`, `npm install`, `bun install`
-
-**配置方式：**
-
-權限規則儲存在 `config/permissions.json`，可以根據需求自訂：
-
-```json
-{
-  "autoApprove": ["Read", "Glob", "Grep"],
-  "requireConfirmation": ["Edit", "Write", "Bash"],
-  "bashCommandRules": {
-    "autoApprove": ["ls", "pwd", "cat"],
-    "requireConfirmation": ["rm", "git push", "npm install"]
-  }
-}
-```
-
-**運作方式：**
-1. Claude 嘗試執行工具時，系統檢查權限配置
-2. 自動執行的操作立即執行，提供流暢體驗
-3. 需確認的操作會在 Telegram 顯示確認訊息，包含操作詳情
-4. 使用者透過按鈕確認或取消操作
-
-詳細說明請參閱 [docs/PERMISSIONS.md](docs/PERMISSIONS.md)
-
-### 📊 使用者統計追蹤
-
-追蹤你與 Claude 的互動統計，掌握使用情況：
-
-**`/stats` 指令顯示：**
-- 👤 User ID
-- 📝 總請求數
-- 🔢 總 Token 使用量
-- ⏰ 最後活動時間
-- 📅 帳戶建立時間
-
-**範例輸出：**
-```
-📊 使用統計
-
-👤 User ID: 123456789
-📝 總請求數: 156
-🔢 總 Token 數: 245,678
-⏰ 最後活動: 2026/01/29 14:30
-📅 建立時間: 2026/01/25 09:15
-```
-
-**資料儲存：**
-- 統計資料自動儲存至 `data/users.json`
-- 每次互動自動更新
-- 跨重啟持久化
-
-**追蹤機制：**
-- 所有訊息處理自動記錄請求數
-- Claude 回應時記錄 Token 使用量
-- 活動時間戳即時更新
-
-完整指令說明請參閱 [docs/COMMANDS.md](docs/COMMANDS.md)
+- **Bun 1.0+** - [安裝 Bun](https://bun.sh/)
+- **Claude Agent SDK** - `@anthropic-ai/claude-agent-sdk` (透過 bun install 自動安裝)
+- **Telegram Bot Token** - 從 [@BotFather](https://t.me/BotFather) 取得
+- **Claude 認證** - CLI 認證（推薦）或 API Key
+- **OpenAI API Key** (可選) - 用於語音訊息轉錄
 
 ---
 
-## 原始專案功能
+## ⚙️ 設定步驟
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Bun](https://img.shields.io/badge/Bun-1.0+-black.svg)](https://bun.sh/)
+### 1. 建立 Telegram Bot
 
-**Turn [Claude Code](https://claude.com/product/claude-code) into your personal assistant, accessible from anywhere via Telegram.**
+1. 在 Telegram 開啟 [@BotFather](https://t.me/BotFather)
+2. 發送 `/newbot` 並按照指示建立你的 bot
+3. 複製 bot token (格式：`1234567890:ABC-DEF...`)
 
-Send text, voice, photos, and documents. See responses and tools usage in real-time.
+設定 bot 指令，發送 `/setcommands` 給 BotFather 並貼上：
 
-![Demo](assets/demo.gif)
-
-## Claude Code as a Personal Assistant
-
-I've started using Claude Code as a personal assistant, and I've built this bot so I can access it from anywhere.
-
-In fact, while Claude Code is described as a powerful AI **coding agent**, it's actually a very capable **general-purpose agent** too when given the right instructions, context, and tools.
-
-To achieve this, I set up a folder with a CLAUDE.md that teaches Claude about me (my preferences, where my notes live, my workflows), has a set of tools and scripts based on my needs, and pointed this bot at that folder.
-
-→ **[📄 See the Personal Assistant Guide](docs/personal-assistant-guide.md)** for detailed setup and examples.
-
-## Bot Features
-
-- 💬 **Text**: Ask questions, give instructions, have conversations
-- 🎤 **Voice**: Speak naturally - transcribed via OpenAI and processed by Claude
-- 📸 **Photos**: Send screenshots, documents, or anything visual for analysis
-- 📄 **Documents**: PDFs, text files, and archives (ZIP, TAR) are extracted and analyzed
-- 🔄 **Session persistence**: Conversations continue across messages
-- 📨 **Message queuing**: Send multiple messages while Claude works - they queue up automatically. Prefix with `!` or use `/stop` to interrupt and send immediately
-- 🧠 **Extended thinking**: Trigger Claude's reasoning by using words like "think" or "reason" - you'll see its thought process as it works (configurable via `THINKING_TRIGGER_KEYWORDS`)
-- 🔘 **Interactive buttons**: Claude can present options as tappable inline buttons via the built-in `ask_user` MCP tool
-
-## Quick Start
-
-```bash
-git clone https://github.com/linuz90/claude-telegram-bot?tab=readme-ov-file
-cd claude-telegram-bot-ts
-
-cp .env.example .env
-# Edit .env with your credentials
-
-bun install
-bun run src/index.ts
+```
+start - 顯示狀態和使用者 ID
+new - 開始新的 session
+resume - 從最近的 session 中選擇並恢復
+stop - 中斷當前查詢
+status - 檢查 Claude 正在做什麼
+restart - 重啟 bot
+pwd - 顯示當前工作目錄
+ls - 列出目錄內容
+cd - 切換工作目錄
+stats - 顯示使用統計
 ```
 
-### Prerequisites
+### 2. 取得你的 Telegram User ID
 
-- **Bun 1.0+** - [Install Bun](https://bun.sh/)
-- **Claude Agent SDK** - `@anthropic-ai/claude-agent-sdk` (installed via bun install)
-- **Telegram Bot Token** from [@BotFather](https://t.me/BotFather)
-- **OpenAI API Key** (optional, for voice transcription)
+1. 在 Telegram 搜尋 [@userinfobot](https://t.me/userinfobot)
+2. 發送任意訊息
+3. 複製你的 User ID (例如：`123456789`)
 
-### Claude Authentication
+### 3. Claude 認證
 
-The bot uses the `@anthropic-ai/claude-agent-sdk` which supports two authentication methods:
+Bot 使用 `@anthropic-ai/claude-agent-sdk`，支援兩種認證方式：
 
-| Method                     | Best For                                | Setup                             |
-| -------------------------- | --------------------------------------- | --------------------------------- |
-| **CLI Auth** (recommended) | High usage, cost-effective              | Run `claude` once to authenticate |
-| **API Key**                | CI/CD, environments without Claude Code | Set `ANTHROPIC_API_KEY` in `.env` |
+| 方式 | 適用情境 | 設定方法 |
+|------|----------|----------|
+| **CLI 認證**（推薦） | 高用量、成本效益 | 執行 `claude` 一次並完成認證 |
+| **API Key** | CI/CD、無 Claude Code 的環境 | 在 `.env` 設定 `ANTHROPIC_API_KEY` |
 
-**CLI Auth** (recommended): The SDK automatically uses your Claude Code login. Just ensure you've run `claude` at least once and authenticated. This uses your Claude Code subscription which is much more cost-effective for heavy usage.
+**CLI 認證**（推薦）：SDK 會自動使用你的 Claude Code 登入。只需確保你至少執行過一次 `claude` 並完成認證。這會使用你的 Claude Code 訂閱，對於重度使用來說更划算。
 
-**API Key**: For environments where Claude Code isn't installed. Get a key from [console.anthropic.com](https://console.anthropic.com/) and add to `.env`:
+**API Key**：適用於沒有安裝 Claude Code 的環境。從 [console.anthropic.com](https://console.anthropic.com/) 取得 API key 並加入 `.env`：
 
 ```bash
 ANTHROPIC_API_KEY=sk-ant-api03-...
 ```
 
-Note: API usage is billed per token and can get expensive quickly for heavy use.
+注意：API 使用按 token 計費，重度使用可能費用較高。
 
-## Configuration
+### 4. 設定環境變數
 
-### 1. Create Your Bot
-
-1. Open [@BotFather](https://t.me/BotFather) on Telegram
-2. Send `/newbot` and follow the prompts to create your bot
-3. Copy the token (looks like `1234567890:ABC-DEF...`)
-
-Then send `/setcommands` to BotFather and paste this:
-
-```
-start - Show status and user ID
-new - Start a fresh session
-resume - Pick from recent sessions to resume
-stop - Interrupt current query
-status - Check what Claude is doing
-restart - Restart the bot
-```
-
-### 2. Configure Environment
-
-Create `.env` with your settings:
+建立 `.env` 檔案並填入設定：
 
 ```bash
-# Required
-TELEGRAM_BOT_TOKEN=1234567890:ABC-DEF...   # From @BotFather
-TELEGRAM_ALLOWED_USERS=123456789           # Your Telegram user ID
+# ============== 必要設定 ==============
 
-# Recommended
-CLAUDE_WORKING_DIR=/path/to/your/folder    # Where Claude runs (loads CLAUDE.md, skills, MCP)
-OPENAI_API_KEY=sk-...                      # For voice transcription
+# Telegram Bot Token (從 @BotFather 取得)
+TELEGRAM_BOT_TOKEN=1234567890:ABC-DEF...
+
+# 允許使用的 Telegram User ID (從 @userinfobot 取得)
+# 可設定多個，用逗號分隔：123456789,987654321
+TELEGRAM_ALLOWED_USERS=123456789
+
+# ============== 推薦設定 ==============
+
+# Claude 工作目錄（Bot 會在這個目錄下執行命令）
+CLAUDE_WORKING_DIR=/Users/你的使用者名稱
+
+# ============== 可選設定 ==============
+
+# OpenAI API Key（用於語音訊息轉錄）
+OPENAI_API_KEY=sk-...
+
+# Anthropic API Key（如果不使用 CLI 認證）
+# ANTHROPIC_API_KEY=sk-ant-api03-...
 ```
 
-**Finding your Telegram user ID:** Message [@userinfobot](https://t.me/userinfobot) on Telegram.
+**檔案存取路徑**：預設情況下，Claude 可以存取：
 
-**File access paths:** By default, Claude can access:
-
-- `CLAUDE_WORKING_DIR` (or home directory if not set)
+- `CLAUDE_WORKING_DIR` (或 home 目錄，如未設定)
 - `~/Documents`, `~/Downloads`, `~/Desktop`
-- `~/.claude` (for Claude Code plans and settings)
+- `~/.claude` (用於 Claude Code 的計畫和設定)
 
-To customize, set `ALLOWED_PATHS` in `.env` (comma-separated). Note: this **overrides** all defaults, so include `~/.claude` if you want plan mode to work:
+若要自訂，在 `.env` 設定 `ALLOWED_PATHS` (逗號分隔)。注意：這會**覆蓋**所有預設值，如果你需要 plan mode 運作，請包含 `~/.claude`：
 
 ```bash
 ALLOWED_PATHS=/your/project,/other/path,~/.claude
 ```
 
-### 3. Configure MCP Servers (Optional)
+### 5. (可選) 設定 MCP 伺服器
 
-Copy and edit the MCP config:
+複製並編輯 MCP 配置：
 
 ```bash
 cp mcp-config.ts mcp-config.local.ts
-# Edit mcp-config.local.ts with your MCP servers
+# 編輯 mcp-config.local.ts，加入你的 MCP 伺服器
 ```
 
-The bot includes a built-in `ask_user` MCP server that lets Claude present options as tappable inline keyboard buttons. Add your own MCP servers (Things, Notion, Typefully, etc.) to give Claude access to your tools.
+Bot 內建 `ask_user` MCP 伺服器，讓 Claude 能以可點擊的 inline keyboard 按鈕呈現選項。你可以加入自己的 MCP 伺服器 (Things, Notion, Typefully 等)，讓 Claude 存取你的工具。
 
-## Bot Commands
+---
 
-| Command    | Description                       |
-| ---------- | --------------------------------- |
-| `/start`   | Show status and your user ID      |
-| `/new`     | Start a fresh session             |
-| `/resume`  | Pick from last 5 sessions to resume (with recap) |
-| `/stop`    | Interrupt current query           |
-| `/status`  | Check what Claude is doing        |
-| `/restart` | Restart the bot                   |
+## 🎮 Bot 指令
 
-## Running as a Service (macOS)
+### 基本指令
 
-```bash
-cp launchagent/com.claude-telegram-ts.plist.template ~/Library/LaunchAgents/com.claude-telegram-ts.plist
-# Edit the plist with your paths and env vars
-launchctl load ~/Library/LaunchAgents/com.claude-telegram-ts.plist
+| 指令 | 說明 |
+|------|------|
+| `/start` | 顯示狀態和你的 user ID |
+| `/new` | 開始新的 session |
+| `/resume` | 從最近 5 個 session 中選擇並恢復（含摘要） |
+| `/stop` | 中斷當前查詢 |
+| `/status` | 檢查 Claude 正在做什麼 |
+| `/restart` | 重啟 bot |
+
+### 工作目錄管理 ⭐
+
+| 指令 | 說明 | 範例 |
+|------|------|------|
+| `/pwd` | 顯示當前工作目錄 | `/pwd` |
+| `/ls [path]` | 列出目錄內容 | `/ls`<br>`/ls Documents`<br>`/ls ~/projects` |
+| `/cd <path>` | 切換工作目錄 | `/cd projects`<br>`/cd ..` |
+
+### 統計功能 ⭐
+
+| 指令 | 說明 |
+|------|------|
+| `/stats` | 顯示使用統計（請求數、token 使用量等） |
+
+詳細指令說明請參考 [指令參考文件](docs/COMMANDS.md)
+
+---
+
+## 🔧 進階功能
+
+### 權限控制自訂
+
+編輯 `config/permissions.json` 自訂權限規則：
+
+```json
+{
+  "autoApprove": [
+    "Read", "Glob", "Grep",
+    "WebSearch", "WebFetch"
+  ],
+  "requireConfirmation": [
+    "Edit", "Write", "Bash"
+  ],
+  "bashCommandRules": {
+    "autoApprove": [
+      "ls", "pwd", "cat", "grep", "find"
+    ],
+    "requireConfirmation": [
+      "rm", "mv", "cp", "git commit", "git push"
+    ]
+  }
+}
 ```
 
-The bot will start automatically on login and restart if it crashes.
+詳細說明請參考 [權限系統文件](docs/PERMISSIONS.md)
 
-**Prevent sleep:** To keep the bot running when your Mac is idle, go to **System Settings → Battery → Options** and enable **"Prevent automatic sleeping when the display is off"** (when on power adapter).
+### 系統服務設定（macOS）
 
-**Logs:**
+讓 Bot 開機自動啟動並在背景持續執行：
 
 ```bash
-tail -f /tmp/claude-telegram-bot-ts.log   # stdout
-tail -f /tmp/claude-telegram-bot-ts.err   # stderr
+# 複製並編輯 plist 檔案
+cp launchagent/com.claude-telegram-ts.plist.template \
+   ~/Library/LaunchAgents/com.claude-telegram-enhanced.plist
+
+# 編輯路徑和環境變數
+nano ~/Library/LaunchAgents/com.claude-telegram-enhanced.plist
+
+# 載入服務
+launchctl bootstrap gui/$(id -u) \
+  ~/Library/LaunchAgents/com.claude-telegram-enhanced.plist
 ```
 
-**Shell aliases:** If running as a service, these aliases make it easy to manage the bot (add to `~/.zshrc` or `~/.bashrc`):
+**防止 Mac 休眠**（可選）：
+
+前往 **系統設定 → 電池 → 選項**，啟用「顯示器關閉時防止自動睡眠」（使用電源轉接器時）。
+
+**管理別名**：在 `~/.zshrc` 加入：
 
 ```bash
-alias cbot='launchctl list | grep com.claude-telegram-ts'
-alias cbot-stop='launchctl bootout gui/$(id -u)/com.claude-telegram-ts 2>/dev/null && echo "Stopped"'
-alias cbot-start='launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.claude-telegram-ts.plist 2>/dev/null && echo "Started"'
-alias cbot-restart='launchctl kickstart -k gui/$(id -u)/com.claude-telegram-ts && echo "Restarted"'
-alias cbot-logs='tail -f /tmp/claude-telegram-bot-ts.log'
+alias tbot='launchctl list | grep com.claude-telegram-enhanced'
+alias tbot-start='launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.claude-telegram-enhanced.plist'
+alias tbot-stop='launchctl bootout gui/$(id -u)/com.claude-telegram-enhanced'
+alias tbot-restart='launchctl kickstart -k gui/$(id -u)/com.claude-telegram-enhanced'
+alias tbot-logs='tail -f /tmp/claude-telegram-bot-ts.log'
 ```
 
-## Development
+---
+
+## 🧪 測試
 
 ```bash
-# Run with auto-reload
-bun --watch run src/index.ts
+# 執行所有測試
+bun test
 
-# Type check
+# TypeScript 類型檢查
 bun run typecheck
-
-# Or directly
-bun run --bun tsc --noEmit
 ```
 
-## Security
+**測試結果**：
+- ✅ 51 項測試全部通過
+- ✅ 100% 通過率
+- ✅ 涵蓋單元測試和整合測試
 
-> **⚠️ Important:** This bot runs Claude Code with **all permission prompts bypassed**. Claude can read, write, and execute commands without confirmation within the allowed paths. This is intentional for a seamless mobile experience, but you should understand the implications before deploying.
+詳細測試報告請參考 [測試文件](docs/TEST_REPORT.md)
 
-**→ [Read the full Security Model](SECURITY.md)** for details on how permissions work and what protections are in place.
+---
 
-Multiple layers protect against misuse:
+## 📚 完整文件
 
-1. **User allowlist** - Only your Telegram IDs can use the bot
-2. **Intent classification** - AI filter blocks dangerous requests
-3. **Path validation** - File access restricted to `ALLOWED_PATHS`
-4. **Command safety** - Destructive patterns like `rm -rf /` are blocked
-5. **Rate limiting** - Prevents runaway usage
-6. **Audit logging** - All interactions logged to `/tmp/claude-telegram-audit.log`
+- 📖 **[快速開始指南](docs/GETTING_STARTED.md)** - 詳細的一步步設定教學
+- 📊 **[設定流程圖](docs/SETUP_FLOWCHART.md)** - 視覺化設定流程
+- 📋 **[指令參考](docs/COMMANDS.md)** - 所有可用指令的完整說明
+- 🔐 **[權限系統](docs/PERMISSIONS.md)** - 權限控制系統的詳細文件
+- ✅ **[測試報告](docs/TEST_REPORT.md)** - 測試結果和手動測試清單
+- ⚡ **[快速參考](QUICK_REFERENCE.md)** - 所有指令和操作的速查表
+- 📝 **[更新日誌](CHANGELOG.md)** - 版本更新歷史
 
-## Troubleshooting
+---
 
-**Bot doesn't respond**
+## 🔒 安全性
 
-- Verify your user ID is in `TELEGRAM_ALLOWED_USERS`
-- Check the bot token is correct
-- Look at logs: `tail -f /tmp/claude-telegram-bot-ts.err`
-- Ensure the bot process is running
+> **⚠️ 重要提醒**：此 bot 執行 Claude Code 時會**繞過所有權限提示**。Claude 可以在允許的路徑內讀取、寫入和執行命令，無需確認。這是為了提供流暢的行動體驗而刻意設計的，但在部署前你應該了解其影響。
 
-**Claude authentication issues**
+**→ [閱讀完整安全模型說明](docs/PERMISSIONS.md)** 了解權限運作方式和防護措施。
 
-- For CLI auth: run `claude` in terminal and verify you're logged in
-- For API key: check `ANTHROPIC_API_KEY` is set and starts with `sk-ant-api03-`
-- Verify the API key has credits at [console.anthropic.com](https://console.anthropic.com/)
+多重防護層級：
 
-**Voice messages fail**
+1. **使用者白名單** - 只有你的 Telegram ID 可以使用 bot
+2. **混合權限控制** - 安全操作自動執行，危險操作需確認
+3. **路徑驗證** - 檔案存取限制在 `ALLOWED_PATHS`
+4. **指令安全** - 封鎖危險模式如 `rm -rf /`
+5. **速率限制** - 防止失控使用
+6. **審計日誌** - 所有互動記錄到 `/tmp/claude-telegram-audit.log`
 
-- Ensure `OPENAI_API_KEY` is set in `.env`
-- Verify the key is valid and has credits
+---
 
-**Claude can't access files**
+## 🐛 故障排除
 
-- Check `CLAUDE_WORKING_DIR` points to an existing directory
-- Verify `ALLOWED_PATHS` includes directories you want Claude to access
-- Ensure the bot process has read/write permissions
+### Bot 沒有回應
 
-**MCP tools not working**
+- 確認你的 user ID 在 `TELEGRAM_ALLOWED_USERS` 中
+- 檢查 bot token 是否正確
+- 查看日誌：`tail -f /tmp/claude-telegram-bot-ts.log`
+- 確認 bot 進程正在執行：`./status.sh`
 
-- Verify `mcp-config.ts` exists and exports properly
-- Check that MCP server dependencies are installed
-- Look for MCP errors in the logs
+### Claude 認證問題
 
-## License
+- CLI 認證：在終端機執行 `claude` 確認已登入
+- API key：檢查 `ANTHROPIC_API_KEY` 已設定且格式為 `sk-ant-api03-`
+- 在 [console.anthropic.com](https://console.anthropic.com/) 確認 API key 有額度
 
-MIT
+### 語音訊息失敗
+
+- 確認 `OPENAI_API_KEY` 已在 `.env` 設定
+- 確認 key 有效且有額度
+
+### Claude 無法存取檔案
+
+- 檢查 `CLAUDE_WORKING_DIR` 指向存在的目錄
+- 確認 `ALLOWED_PATHS` 包含你要存取的目錄
+- 確認 bot 進程有讀寫權限
+
+### MCP 工具無法運作
+
+- 確認 `mcp-config.ts` 存在且正確匯出
+- 檢查 MCP 伺服器的依賴已安裝
+- 查看日誌中的 MCP 錯誤訊息
+
+更多故障排除資訊請參考 [快速開始指南](docs/GETTING_STARTED.md) 的「常見問題」章節。
+
+---
+
+## 🎯 使用範例
+
+### 日常開發助手
+
+```
+你: /cd ~/projects/my-app
+Bot: ✅ 已切換到 /Users/vincewang/projects/my-app
+
+你: /ls src
+Bot: 📁 components
+     📁 utils
+     📄 index.ts
+
+你: 幫我重構 src/utils/helpers.ts，移除重複的程式碼
+Bot: [開始分析並重構...]
+```
+
+### 文件分析
+
+```
+你: /cd ~/Downloads
+你: [上傳 PDF 檔案]
+你: 幫我整理這份報告的重點
+Bot: [分析並整理重點...]
+```
+
+### 深度思考
+
+```
+你: think 比較 Docker 和 Podman 的優缺點
+Bot: [顯示思考過程]
+     [提供詳細比較分析...]
+```
+
+---
+
+## 🤝 貢獻
+
+歡迎貢獻！請隨時：
+
+- 🐛 [回報問題](https://github.com/a23444452/Claude_Code_Telegram_Bot/issues)
+- 💡 [提出功能建議](https://github.com/a23444452/Claude_Code_Telegram_Bot/issues/new)
+- 🔀 提交 Pull Request
+
+---
+
+## 📄 授權
+
+MIT License - 詳見 [LICENSE](LICENSE) 檔案
+
+---
+
+## 🙏 致謝
+
+- **原始專案**：[linuz90/claude-telegram-bot](https://github.com/linuz90/claude-telegram-bot) - 感謝提供優秀的基礎架構
+- **框架**：[Grammy](https://grammy.dev/) - Telegram Bot Framework
+- **AI SDK**：[Anthropic Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-typescript)
+- **Runtime**：[Bun](https://bun.sh/) - Fast all-in-one JavaScript runtime
+
+---
+
+## 📊 專案統計
+
+- **版本**：v1.0.0
+- **程式語言**：TypeScript
+- **測試**：51 項測試，100% 通過率
+- **文件**：7 個主要文件，總計 60+ KB
+- **授權**：MIT
+
+---
+
+**有問題嗎？** 查看 [完整文件](docs/GETTING_STARTED.md) 或在 [GitHub Issues](https://github.com/a23444452/Claude_Code_Telegram_Bot/issues) 提問。
+
+**準備開始了嗎？** 執行 `./start.sh` 並在 Telegram 開始使用！🚀
