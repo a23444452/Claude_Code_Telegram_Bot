@@ -300,3 +300,28 @@ export async function handleRetry(ctx: Context): Promise<void> {
 
   await handleText(fakeCtx);
 }
+
+/**
+ * /pwd - Show current working directory.
+ */
+export async function handlePwd(ctx: Context): Promise<void> {
+  const userId = ctx.from?.id;
+  if (!userId) {
+    await ctx.reply("❌ Cannot identify user");
+    return;
+  }
+
+  if (!isAuthorized(userId, ALLOWED_USERS)) {
+    await ctx.reply("Unauthorized.");
+    return;
+  }
+
+  // Get working directory from session or use default
+  const workingDir = WORKING_DIR;
+
+  await ctx.reply(
+    `📁 Current working directory:\n\n` +
+    `<code>${workingDir}</code>`,
+    { parse_mode: "HTML" }
+  );
+}
