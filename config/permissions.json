@@ -1,0 +1,35 @@
+{
+  "autoApprove": [
+    "Read",
+    "Glob",
+    "Grep",
+    "WebSearch",
+    "WebFetch"
+  ],
+  "requireConfirmation": [
+    "Edit",
+    "Write",
+    "Bash"
+  ],
+  "bashCommandRules": {
+    "autoApprove": [
+      "ls",
+      "pwd",
+      "cat",
+      "grep",
+      "find",
+      "echo",
+      "which"
+    ],
+    "requireConfirmation": [
+      "rm",
+      "mv",
+      "cp",
+      "git commit",
+      "git push",
+      "npm install",
+      "bun install",
+      "pip install"
+    ]
+  }
+}
