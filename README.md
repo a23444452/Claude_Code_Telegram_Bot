@@ -4,9 +4,101 @@
 
 ## 新增功能
 
-- 🗂️ 工作目錄管理 (/cd, /pwd, /ls)
-- 🔐 混合模式權限控制（自動 vs 需確認）
-- 📊 使用者統計與配額管理
+### 🗂️ 工作目錄管理
+
+在 Telegram 中輕鬆管理 Claude 的工作目錄，讓 Claude 能在正確的專案路徑下工作：
+
+- **`/pwd`** - 顯示當前工作目錄
+- **`/ls [path]`** - 列出目錄內容，支援相對路徑和絕對路徑
+- **`/cd <path>`** - 切換工作目錄（包含安全性檢查）
+
+**使用範例：**
+```
+/cd ~/projects/my-app
+/pwd
+→ 📁 /Users/vincewang/projects/my-app
+
+/ls src
+→ 📁 components
+  📁 utils
+  📄 index.ts
+  📄 App.tsx
+```
+
+**安全機制：**
+- 所有路徑操作受 `ALLOWED_PATHS` 限制
+- 嘗試存取未授權目錄會被拒絕
+- 自動驗證目錄存在性
+
+### 🔐 混合模式權限控制
+
+智慧型權限系統，自動執行安全操作，危險操作需要確認，提供最佳的使用體驗和安全性平衡：
+
+**自動執行（無需確認）：**
+- 檔案讀取工具：`Read`, `Glob`, `Grep`
+- 網路查詢工具：`WebSearch`, `WebFetch`
+- 安全 Bash 指令：`ls`, `pwd`, `cat`, `grep`, `find`, `echo`, `which`
+
+**需要確認：**
+- 檔案修改工具：`Edit`, `Write`
+- 危險 Bash 指令：`rm`, `mv`, `cp`, `git commit`, `git push`, `npm install`, `bun install`
+
+**配置方式：**
+
+權限規則儲存在 `config/permissions.json`，可以根據需求自訂：
+
+```json
+{
+  "autoApprove": ["Read", "Glob", "Grep"],
+  "requireConfirmation": ["Edit", "Write", "Bash"],
+  "bashCommandRules": {
+    "autoApprove": ["ls", "pwd", "cat"],
+    "requireConfirmation": ["rm", "git push", "npm install"]
+  }
+}
+```
+
+**運作方式：**
+1. Claude 嘗試執行工具時，系統檢查權限配置
+2. 自動執行的操作立即執行，提供流暢體驗
+3. 需確認的操作會在 Telegram 顯示確認訊息，包含操作詳情
+4. 使用者透過按鈕確認或取消操作
+
+詳細說明請參閱 [docs/PERMISSIONS.md](docs/PERMISSIONS.md)
+
+### 📊 使用者統計追蹤
+
+追蹤你與 Claude 的互動統計，掌握使用情況：
+
+**`/stats` 指令顯示：**
+- 👤 User ID
+- 📝 總請求數
+- 🔢 總 Token 使用量
+- ⏰ 最後活動時間
+- 📅 帳戶建立時間
+
+**範例輸出：**
+```
+📊 使用統計
+
+👤 User ID: 123456789
+📝 總請求數: 156
+🔢 總 Token 數: 245,678
+⏰ 最後活動: 2026/01/29 14:30
+📅 建立時間: 2026/01/25 09:15
+```
+
+**資料儲存：**
+- 統計資料自動儲存至 `data/users.json`
+- 每次互動自動更新
+- 跨重啟持久化
+
+**追蹤機制：**
+- 所有訊息處理自動記錄請求數
+- Claude 回應時記錄 Token 使用量
+- 活動時間戳即時更新
+
+完整指令說明請參閱 [docs/COMMANDS.md](docs/COMMANDS.md)
 
 ---
 
