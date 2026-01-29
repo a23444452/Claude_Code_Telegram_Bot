@@ -92,3 +92,16 @@ export interface SessionConfig {
 export interface EnhancedSavedSession extends SavedSession {
   config?: SessionConfig;
 }
+
+// Permission confirmation workflow
+export interface PendingOperation {
+  id: string;
+  tool: string;
+  params: any;
+  timestamp: Date;
+  messageId?: number;
+}
+
+export interface PermissionCallback {
+  (operationId: string, approved: boolean): Promise<void>;
+}
