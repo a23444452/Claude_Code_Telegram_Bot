@@ -1,6 +1,7 @@
 {
   "name": "claude-telegram-bot-enhanced",
   "version": "1.0.0",
+  "description": "Enhanced Claude Telegram Bot with directory management, permission control, and user statistics",
   "module": "src/index.ts",
   "type": "module",
   "private": true,
