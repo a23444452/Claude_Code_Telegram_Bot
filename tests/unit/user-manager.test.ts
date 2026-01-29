@@ -1,11 +1,17 @@
 import { describe, test, expect, beforeEach } from "bun:test";
 import { UserManager } from "../../src/user-manager";
+import { unlinkSync, existsSync } from "fs";
 
 describe("UserManager", () => {
   let manager: UserManager;
+  const testDataPath = "./data/test-users.json";
 
   beforeEach(() => {
-    manager = new UserManager();
+    // Clean up test data file before each test
+    if (existsSync(testDataPath)) {
+      unlinkSync(testDataPath);
+    }
+    manager = new UserManager(testDataPath);
   });
 
   test("should track user request", () => {

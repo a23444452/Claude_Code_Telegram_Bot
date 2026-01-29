@@ -19,6 +19,7 @@ import {
   handlePwd,
   handleLs,
   handleCd,
+  handleStats,
   handleText,
   handleVoice,
   handlePhoto,
@@ -62,6 +63,7 @@ bot.command("retry", handleRetry);
 bot.command("pwd", handlePwd);
 bot.command("ls", handleLs);
 bot.command("cd", handleCd);
+bot.command("stats", handleStats);
 
 // ============== Message Handlers ==============
 

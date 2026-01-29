@@ -10,6 +10,10 @@ import { WORKING_DIR, ALLOWED_USERS, RESTART_FILE } from "../config";
 import { isAuthorized, isPathAllowed } from "../security";
 import { readdirSync, statSync, existsSync } from "fs";
 import { resolve } from "path";
+import { UserManager } from "../user-manager";
+
+// Initialize user manager
+const userManager = new UserManager();
 
 /**
  * /start - Show welcome message and status.
@@ -489,3 +493,49 @@ export async function handleCd(ctx: Context): Promise<void> {
     { parse_mode: "HTML" }
   );
 }
+
+/**
+ * /stats - Show user statistics.
+ */
+export async function handleStats(ctx: Context): Promise<void> {
+  const userId = ctx.from?.id;
+  if (!userId) {
+    await ctx.reply("❌ Cannot identify user");
+    return;
+  }
+
+  if (!isAuthorized(userId, ALLOWED_USERS)) {
+    await ctx.reply("Unauthorized.");
+    return;
+  }
+
+  const stats = userManager.getStats(userId);
+
+  const message = [
+    `📊 使用統計`,
+    ``,
+    `👤 User ID: ${stats.userId}`,
+    `📝 總請求數: ${stats.totalRequests}`,
+    `🔢 總 Token 數: ${stats.totalTokens.toLocaleString()}`,
+    `⏰ 最後活動: ${formatDate(stats.lastActive)}`,
+    `📅 建立時間: ${formatDate(stats.createdAt)}`
+  ].join("\n");
+
+  await ctx.reply(message);
+}
+
+/**
+ * Format date for display.
+ */
+function formatDate(date: Date): string {
+  return date.toLocaleString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+// Export userManager for use in other modules
+export { userManager };

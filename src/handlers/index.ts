@@ -13,6 +13,8 @@ export {
   handlePwd,
   handleLs,
   handleCd,
+  handleStats,
+  userManager,
 } from "./commands";
 export { handleText } from "./text";
 export { handleVoice } from "./voice";
