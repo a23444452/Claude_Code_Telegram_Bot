@@ -10,7 +10,25 @@
 
 **完全新手?** 請直接閱讀 → [📖 完整操作指南 (GETTING_STARTED.md)](docs/GETTING_STARTED.md)
 
-**快速啟動** (已有經驗):
+**超快速啟動** (一鍵腳本):
+
+```bash
+# 1. Clone 專案
+git clone https://github.com/a23444452/Claude_Code_Telegram_Bot.git
+cd Claude_Code_Telegram_Bot
+
+# 2. 執行一鍵啟動腳本
+./start.sh
+```
+
+腳本會自動:
+- ✅ 檢查 Bun 安裝
+- ✅ 檢查配置檔案
+- ✅ 安裝依賴(如需要)
+- ✅ 執行測試驗證
+- ✅ 提供啟動選項(前台/背景)
+
+**手動啟動** (傳統方式):
 
 ```bash
 # 1. Clone 專案
@@ -28,9 +46,16 @@ nano .env  # 編輯並填入你的 Bot Token 和 User ID
 bun run src/index.ts
 ```
 
+**管理腳本**:
+- `./start.sh` - 一鍵啟動 Bot (含環境檢查)
+- `./stop.sh` - 停止 Bot
+- `./status.sh` - 完整狀態檢查
+
 **前置需求**: Bun, Telegram Bot Token, Claude Code 或 Anthropic API Key
 
-詳細步驟請參考 [完整操作指南](docs/GETTING_STARTED.md)
+詳細步驟請參考:
+- 📖 [完整操作指南 (GETTING_STARTED.md)](docs/GETTING_STARTED.md) - 詳細的一步步教學
+- 📊 [設定流程圖 (SETUP_FLOWCHART.md)](docs/SETUP_FLOWCHART.md) - 視覺化流程指南
 
 ---
 
