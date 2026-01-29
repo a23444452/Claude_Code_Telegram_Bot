@@ -8,7 +8,7 @@ import type { Context } from "grammy";
 import { session } from "../session";
 import { WORKING_DIR, ALLOWED_USERS, RESTART_FILE } from "../config";
 import { isAuthorized, isPathAllowed } from "../security";
-import { readdirSync, statSync } from "fs";
+import { readdirSync, statSync, existsSync } from "fs";
 import { resolve } from "path";
 
 /**
@@ -399,4 +399,93 @@ export async function handleLs(ctx: Context): Promise<void> {
       { parse_mode: "HTML" }
     );
   }
+}
+
+/**
+ * /cd - Change working directory.
+ */
+export async function handleCd(ctx: Context): Promise<void> {
+  const userId = ctx.from?.id;
+  if (!userId) {
+    await ctx.reply("❌ Cannot identify user");
+    return;
+  }
+
+  if (!isAuthorized(userId, ALLOWED_USERS)) {
+    await ctx.reply("Unauthorized.");
+    return;
+  }
+
+  // Parse path argument
+  const text = ctx.message?.text || "";
+  const parts = text.split(" ");
+
+  if (parts.length < 2) {
+    await ctx.reply(
+      `Usage: /cd &lt;path&gt;\n\n` +
+      `Examples:\n` +
+      `• /cd Documents\n` +
+      `• /cd /Users/vincewang/projects\n` +
+      `• /cd ..`,
+      { parse_mode: "HTML" }
+    );
+    return;
+  }
+
+  const pathArg = parts.slice(1).join(" ");
+
+  // Resolve path (relative to current working directory)
+  const targetPath = resolve(WORKING_DIR, pathArg);
+
+  // Security check
+  if (!isPathAllowed(targetPath)) {
+    await ctx.reply(
+      `❌ Access denied\n\n` +
+      `Path not in allowed directories:\n` +
+      `<code>${targetPath}</code>\n\n` +
+      `Allowed paths are defined in ALLOWED_PATHS config.`,
+      { parse_mode: "HTML" }
+    );
+    return;
+  }
+
+  // Check if directory exists
+  if (!existsSync(targetPath)) {
+    await ctx.reply(
+      `❌ Directory not found:\n\n` +
+      `<code>${targetPath}</code>`,
+      { parse_mode: "HTML" }
+    );
+    return;
+  }
+
+  // Check if it's a directory
+  try {
+    const stats = statSync(targetPath);
+    if (!stats.isDirectory()) {
+      await ctx.reply(
+        `❌ Not a directory:\n\n` +
+        `<code>${targetPath}</code>`,
+        { parse_mode: "HTML" }
+      );
+      return;
+    }
+  } catch (error: any) {
+    await ctx.reply(
+      `❌ Error accessing path:\n\n` +
+      `<code>${error.message}</code>`,
+      { parse_mode: "HTML" }
+    );
+    return;
+  }
+
+  // TODO: Update session working directory
+  // This will be implemented when we add session state management
+
+  await ctx.reply(
+    `✅ Changed working directory to:\n\n` +
+    `<code>${targetPath}</code>\n\n` +
+    `Note: This will be persisted in the next update.`,
+    { parse_mode: "HTML" }
+  );
 }
