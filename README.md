@@ -2,6 +2,38 @@
 
 基於 [linuz90/claude-telegram-bot](https://github.com/linuz90/claude-telegram-bot) 的增強版本
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Bun](https://img.shields.io/badge/Bun-1.0+-black.svg)](https://bun.sh/)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/a23444452/Claude_Code_Telegram_Bot/releases)
+
+## 🚀 快速開始
+
+**完全新手?** 請直接閱讀 → [📖 完整操作指南 (GETTING_STARTED.md)](docs/GETTING_STARTED.md)
+
+**快速啟動** (已有經驗):
+
+```bash
+# 1. Clone 專案
+git clone https://github.com/a23444452/Claude_Code_Telegram_Bot.git
+cd Claude_Code_Telegram_Bot
+
+# 2. 安裝依賴
+bun install
+
+# 3. 設定環境變數
+cp .env.example .env
+nano .env  # 編輯並填入你的 Bot Token 和 User ID
+
+# 4. 啟動 Bot
+bun run src/index.ts
+```
+
+**前置需求**: Bun, Telegram Bot Token, Claude Code 或 Anthropic API Key
+
+詳細步驟請參考 [完整操作指南](docs/GETTING_STARTED.md)
+
+---
+
 ## 新增功能
 
 ### 🗂️ 工作目錄管理
