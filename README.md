@@ -1,4 +1,16 @@
-# Claude Telegram Bot
+# Claude Telegram Bot - Enhanced Edition
+
+基於 [linuz90/claude-telegram-bot](https://github.com/linuz90/claude-telegram-bot) 的增強版本
+
+## 新增功能
+
+- 🗂️ 工作目錄管理 (/cd, /pwd, /ls)
+- 🔐 混合模式權限控制（自動 vs 需確認）
+- 📊 使用者統計與配額管理
+
+---
+
+## 原始專案功能
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bun](https://img.shields.io/badge/Bun-1.0+-black.svg)](https://bun.sh/)
