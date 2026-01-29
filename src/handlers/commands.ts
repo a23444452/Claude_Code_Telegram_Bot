@@ -7,7 +7,9 @@
 import type { Context } from "grammy";
 import { session } from "../session";
 import { WORKING_DIR, ALLOWED_USERS, RESTART_FILE } from "../config";
-import { isAuthorized } from "../security";
+import { isAuthorized, isPathAllowed } from "../security";
+import { readdirSync, statSync } from "fs";
+import { resolve } from "path";
 
 /**
  * /start - Show welcome message and status.
@@ -324,4 +326,77 @@ export async function handlePwd(ctx: Context): Promise<void> {
     `<code>${workingDir}</code>`,
     { parse_mode: "HTML" }
   );
+}
+
+/**
+ * /ls - List directory contents.
+ */
+export async function handleLs(ctx: Context): Promise<void> {
+  const userId = ctx.from?.id;
+  if (!userId) {
+    await ctx.reply("❌ Cannot identify user");
+    return;
+  }
+
+  if (!isAuthorized(userId, ALLOWED_USERS)) {
+    await ctx.reply("Unauthorized.");
+    return;
+  }
+
+  // Parse path argument
+  const text = ctx.message?.text || "";
+  const parts = text.split(" ");
+  const pathArg = parts.length > 1 ? parts.slice(1).join(" ") : ".";
+
+  // Resolve path (relative to working directory)
+  const targetPath = resolve(WORKING_DIR, pathArg);
+
+  // Security check
+  if (!isPathAllowed(targetPath)) {
+    await ctx.reply(
+      `❌ Access denied\n\n` +
+      `Path not in allowed directories:\n` +
+      `<code>${targetPath}</code>`,
+      { parse_mode: "HTML" }
+    );
+    return;
+  }
+
+  try {
+    const entries = readdirSync(targetPath);
+
+    if (entries.length === 0) {
+      await ctx.reply(
+        `📁 <code>${targetPath}</code>\n\n(empty directory)`,
+        { parse_mode: "HTML" }
+      );
+      return;
+    }
+
+    // Format entries with type indicators
+    const formatted = entries
+      .map(name => {
+        try {
+          const fullPath = resolve(targetPath, name);
+          const stats = statSync(fullPath);
+          const indicator = stats.isDirectory() ? "📁" : "📄";
+          return `${indicator} ${name}`;
+        } catch {
+          return `❓ ${name}`;
+        }
+      })
+      .join("\n");
+
+    await ctx.reply(
+      `📁 <code>${targetPath}</code>\n\n` +
+      `${formatted}`,
+      { parse_mode: "HTML" }
+    );
+  } catch (error: any) {
+    await ctx.reply(
+      `❌ Error listing directory:\n\n` +
+      `<code>${error.message}</code>`,
+      { parse_mode: "HTML" }
+    );
+  }
 }
